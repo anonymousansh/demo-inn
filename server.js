@@ -23,6 +23,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 const Room = require('./models/Room');
 const Booking = require('./models/Booking');
 
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
 async function connectDatabase() {
   try {
     await mongoose.connect(MONGODB_URI);

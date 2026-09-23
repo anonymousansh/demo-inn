@@ -6,7 +6,10 @@ async function loadRooms() {
 
   try {
     const response = await fetch(`${API_BASE}/api/rooms`);
-    if (!response.ok) throw new Error('Rooms could not be loaded.');
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || 'Rooms could not be loaded.');
+    }
     const rooms = await response.json();
 
     select.innerHTML = '<option value="">Choose a room</option>';
@@ -64,7 +67,10 @@ document.getElementById('bookingForm').addEventListener('submit', async function
 
   try {
     const roomResponse = await fetch(`${API_BASE}/api/rooms`);
-    if (!roomResponse.ok) throw new Error('Rooms could not be loaded.');
+    if (!roomResponse.ok) {
+      const error = await roomResponse.json().catch(() => ({}));
+      throw new Error(error.message || 'Rooms could not be loaded.');
+    }
     const rooms = await roomResponse.json();
     const selectedRoom = rooms.find((room) => String(room._id || room.id) === String(roomId));
 
