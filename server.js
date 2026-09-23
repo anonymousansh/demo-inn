@@ -110,13 +110,23 @@ function sendBookingEmail(booking) {
 }
 
 app.get('/api/rooms', async (req, res) => {
-  const rooms = await Room.find();
-  res.json(rooms);
+  try {
+    const rooms = await Room.find();
+    res.json(rooms);
+  } catch (error) {
+    console.error('Rooms API error:', error.message);
+    res.status(503).json({ message: 'Database is unavailable. Check MONGODB_URI.' });
+  }
 });
 
 app.get('/api/bookings', async (req, res) => {
-  const bookings = await Booking.find().sort({ createdAt: -1 });
-  res.json(bookings);
+  try {
+    const bookings = await Booking.find().sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (error) {
+    console.error('Bookings API error:', error.message);
+    res.status(503).json({ message: 'Database is unavailable. Check MONGODB_URI.' });
+  }
 });
 
 app.post('/api/bookings', async (req, res) => {
@@ -169,8 +179,9 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-connectDatabase();
-seedRooms();
+connectDatabase()
+  .then(() => seedRooms())
+  .catch((error) => console.error('Room seed error:', error.message));
 
 app.listen(PORT, () => {
   console.log(`Demo Inn backend running on http://localhost:${PORT}`);
